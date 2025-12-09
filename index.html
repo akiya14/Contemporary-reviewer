@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Contemporary World Flashcards – Pink Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Link to external CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <h1>💗 Contemporary World Flashcards</h1>
+    <div class="subtitle">Flip the card to see the answer • Track your score as you review</div>
+
+    <div class="controls">
+      <select id="topicFilter">
+        <option value="all">All Topics</option>
+        <option value="migration">I. Global Migration & Gender Bias</option>
+        <option value="food">II. Food Security & Global Citizenship</option>
+        <option value="media">III. Global Media Cultures</option>
+        <option value="demography">IV. Global Demography</option>
+      </select>
+      <button id="shuffleBtn">🔀 Shuffle Deck</button>
+      <button id="restartBtn">⟳ Restart Deck</button>
+    </div>
+
+    <div class="layout">
+      <!-- LEFT: Flashcard -->
+      <div>
+        <div class="flashcard-wrapper">
+          <div class="flashcard" id="flashcard">
+            <div class="side front">
+              <div class="label">Question</div>
+              <div class="qtext" id="questionText">Loading…</div>
+              <div class="hint">Tap the card or press “Flip Card” to see the answer.</div>
+            </div>
+            <div class="side back">
+              <div class="label">Answer</div>
+              <div class="atext" id="answerText">Answer goes here.</div>
+              <div class="hint">Now mark if you got it right or wrong to update your score.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="nav-row">
+          <button id="prevBtn">⬅ Previous</button>
+          <button class="primary" id="flipBtn">Flip Card</button>
+          <button id="nextBtn">Next ➡</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Score / Progress -->
+      <div class="score-card">
+        <div class="score-title">📊 Progress & Score</div>
+        <div class="score-line" id="cardCounter">Card 1 of 1</div>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="score-line" id="scoreLine">
+          Correct: <span>0</span> • Attempted: <span>0</span>
+        </div>
+        <div class="accuracy-pill" id="accuracyPill">Accuracy: 0%</div>
+
+        <div class="correct-row">
+          <button id="correctBtn">✅ I was correct</button>
+          <button id="wrongBtn">❌ I was wrong</button>
+        </div>
+
+        <div class="mini-note">
+          ✔ Tip: Try to answer from memory first, then flip and grade yourself honestly.<br/>
+          🎀 Progress bar shows how many cards you've already graded in this deck.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // FULL CARD DATA (from your reviewer)
+    const allCards = [
+      // I. GLOBAL MIGRATION & GENDER BIAS
+      {
+        topic: "migration",
+        q: "What is Global Migration?",
+        a: "The movement of people across national borders to seek work, safety, education, or better living conditions. It connects cultures, economies, and societies."
+      },
+      {
+        topic: "migration",
+        q: "What are push factors in migration?",
+        a: "Negative conditions that force people to leave their country, such as poverty, conflict, disasters, and lack of opportunities."
+      },
+      {
+        topic: "migration",
+        q: "What are pull factors in migration?",
+        a: "Positive conditions that attract migrants to a new country, such as higher wages, peace, better services, and job demand."
+      },
+      {
+        topic: "migration",
+        q: "Who are international migrants?",
+        a: "People who move from one country to another to live, work, or seek safety."
+      },
+      {
+        topic: "migration",
+        q: "Who are forced migrants?",
+        a: "Individuals who move because they are escaping war, violence, or disasters, such as refugees and asylum seekers."
+      },
+      {
+        topic: "migration",
+        q: "What is gender bias in the workplace?",
+        a: "Unfair treatment based on gender, affecting hiring, pay, promotion, opportunities, and workplace respect."
+      },
+      {
+        topic: "migration",
+        q: "What is the wage gap?",
+        a: "The difference in average pay between men and women doing the same or similar work."
+      },
+      {
+        topic: "migration",
+        q: "What is occupational segregation?",
+        a: "When certain jobs are labeled as 'for men' or 'for women,' causing unequal representation in industries."
+      },
+      {
+        topic: "migration",
+        q: "What is the 'triple burden' of women?",
+        a: "Women perform three types of work simultaneously: reproductive work (household & caregiving), productive work (paid jobs), and community work (voluntary responsibilities)."
+      },
+      {
+        topic: "migration",
+        q: "What is brain drain?",
+        a: "Loss of skilled workers from a home country due to migration, reducing local innovation and workforce strength."
+      },
+      {
+        topic: "migration",
+        q: "What is a Bilateral Labor Agreement (BLA)?",
+        a: "A contract between two countries to protect migrant workers' rights such as fair wages, safety, and legal assistance."
+      },
+
+      // II. FOOD SECURITY & GLOBAL CITIZENSHIP
+      {
+        topic: "food",
+        q: "What is Food Security (FAO)?",
+        a: "A state where all people have consistent access to safe, nutritious, and sufficient food for a healthy life."
+      },
+      {
+        topic: "food",
+        q: "Name the four dimensions of food security.",
+        a: "Availability, Access, Utilization, and Stability."
+      },
+      {
+        topic: "food",
+        q: "In food security, what does 'availability' mean?",
+        a: "Having enough food produced and supplied."
+      },
+      {
+        topic: "food",
+        q: "In food security, what does 'access' mean?",
+        a: "Being able to afford or physically reach food."
+      },
+      {
+        topic: "food",
+        q: "In food security, what does 'utilization' mean?",
+        a: "Proper use of food including nutrition, safety, and health."
+      },
+      {
+        topic: "food",
+        q: "In food security, what does 'stability' mean?",
+        a: "Food supply must be secure over time, even during crisis."
+      },
+      {
+        topic: "food",
+        q: "What is food insecurity?",
+        a: "When people lack reliable access to adequate and nutritious food due to poverty, conflict, climate change, or price increases."
+      },
+      {
+        topic: "food",
+        q: "What is climate-smart agriculture?",
+        a: "Farming methods designed to increase productivity, reduce emissions, and adapt to climate change."
+      },
+      {
+        topic: "food",
+        q: "What is water scarcity?",
+        a: "A condition where water demand exceeds supply due to drought, pollution, or poor management."
+      },
+      {
+        topic: "food",
+        q: "What is soil degradation?",
+        a: "Decline in soil quality due to over-farming, deforestation, and chemicals, reducing crop productivity."
+      },
+      {
+        topic: "food",
+        q: "What is global citizenship?",
+        a: "A mindset where individuals understand global issues and take responsible actions to create positive change for the world."
+      },
+      {
+        topic: "food",
+        q: "What is food citizenship?",
+        a: "The responsibility to make ethical and sustainable food choices, support farmers, reduce waste, and advocate for food justice."
+      },
+      {
+        topic: "food",
+        q: "What is sustainable agriculture?",
+        a: "Farming that protects the environment, supports farmers, and ensures food for future generations."
+      },
+
+      // III. GLOBAL MEDIA CULTURES
+      {
+        topic: "media",
+        q: "What is media?",
+        a: "Channels used to communicate information (e.g., TV, internet, radio, newspapers)."
+      },
+      {
+        topic: "media",
+        q: "What is culture?",
+        a: "Shared behaviors, beliefs, traditions, and ways of life passed across generations."
+      },
+      {
+        topic: "media",
+        q: "What is global media culture?",
+        a: "The worldwide exchange of ideas, values, and cultural practices through media."
+      },
+      {
+        topic: "media",
+        q: "What is cultural convergence?",
+        a: "When different cultures begin to look similar because of global influence, often through media."
+      },
+      {
+        topic: "media",
+        q: "What is cultural differentialism?",
+        a: "The belief that cultures remain distinct and are not easily changed by global forces."
+      },
+      {
+        topic: "media",
+        q: "What is cultural hybridization?",
+        a: "When local and global cultures combine to create new blended cultural forms (e.g., K-pop mixing Western pop and Korean culture)."
+      },
+      {
+        topic: "media",
+        q: "What are global products?",
+        a: "Goods sold and recognized worldwide with the same brand, such as Apple, McDonald's, Adidas."
+      },
+      {
+        topic: "media",
+        q: "What are cultural products?",
+        a: "Items unique to a community’s heritage, such as jeepneys, bahay kubo, and festivals."
+      },
+      {
+        topic: "media",
+        q: "What is digital media?",
+        a: "Electronic content accessed through the internet, enabling global communication and online business."
+      },
+
+      // IV. GLOBAL DEMOGRAPHY
+      {
+        topic: "demography",
+        q: "What is demography?",
+        a: "The scientific study of human populations, including size, composition, and changes over time."
+      },
+      {
+        topic: "demography",
+        q: "What is the fertility rate?",
+        a: "The average number of children a woman is expected to have in her lifetime."
+      },
+      {
+        topic: "demography",
+        q: "What is the mortality rate?",
+        a: "The number of deaths per 1,000 people in a population."
+      },
+      {
+        topic: "demography",
+        q: "In demography, what is migration?",
+        a: "Movement of people between places that changes population size and distribution."
+      },
+      {
+        topic: "demography",
+        q: "What is social mobility?",
+        a: "Ability of individuals or families to improve their economic or social status."
+      },
+      {
+        topic: "demography",
+        q: "What is dynamic demography?",
+        a: "Study of processes that change populations—fertility, mortality, migration."
+      },
+      {
+        topic: "demography",
+        q: "What is static demography?",
+        a: "Study of population structure at one moment in time (age, sex, race, occupation)."
+      },
+      {
+        topic: "demography",
+        q: "What is the demographic cycle?",
+        a: "A model describing how population growth changes from high birth + high death rates to low birth + low death rates."
+      },
+      {
+        topic: "demography",
+        q: "What is a pro-natalist policy?",
+        a: "Government programs that encourage families to have more children (e.g., Japan)."
+      },
+      {
+        topic: "demography",
+        q: "What is an anti-natalist policy?",
+        a: "Policies that aim to limit population growth (e.g., China’s one-child policy)."
+      },
+      {
+        topic: "demography",
+        q: "What is a population pyramid?",
+        a: "A graph showing population distribution by age and sex (expansive, stationary, constrictive)."
+      }
+    ];
+
+    let deck = [...allCards];
+    let currentIndex = 0;
+
+    let correctCount = 0;
+    let attemptedCount = 0;
+
+    const flashcard = document.getElementById("flashcard");
+    const questionTextEl = document.getElementById("questionText");
+    const answerTextEl = document.getElementById("answerText");
+    const cardCounter = document.getElementById("cardCounter");
+    const progressFill = document.getElementById("progressFill");
+    const scoreLine = document.getElementById("scoreLine");
+    const accuracyPill = document.getElementById("accuracyPill");
+
+    const topicFilter = document.getElementById("topicFilter");
+    const shuffleBtn = document.getElementById("shuffleBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const flipBtn = document.getElementById("flipBtn");
+    const correctBtn = document.getElementById("correctBtn");
+    const wrongBtn = document.getElementById("wrongBtn");
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
+    function resetScore() {
+      correctCount = 0;
+      attemptedCount = 0;
+      updateScoreUI();
+    }
+
+    function updateScoreUI() {
+      scoreLine.innerHTML = `Correct: <span>${correctCount}</span> • Attempted: <span>${attemptedCount}</span>`;
+      const accuracy = attemptedCount === 0 ? 0 : Math.round((correctCount / attemptedCount) * 100);
+      accuracyPill.textContent = `Accuracy: ${accuracy}%`;
+
+      const progressPercent = deck.length === 0 ? 0 : Math.min(100, (attemptedCount / deck.length) * 100);
+      progressFill.style.width = progressPercent + "%";
+    }
+
+    function renderCard() {
+      if (deck.length === 0) {
+        questionTextEl.textContent = "No cards in this deck.";
+        answerTextEl.textContent = "";
+        cardCounter.textContent = "0 of 0";
+        prevBtn.disabled = true;
+        nextBtn.disabled = true;
+        flipBtn.disabled = true;
+        correctBtn.disabled = true;
+        wrongBtn.disabled = true;
+        return;
+      }
+
+      const card = deck[currentIndex];
+      questionTextEl.textContent = card.q;
+      answerTextEl.textContent = card.a;
+      cardCounter.textContent = `Card ${currentIndex + 1} of ${deck.length}`;
+
+      prevBtn.disabled = currentIndex === 0;
+      nextBtn.disabled = currentIndex === deck.length - 1;
+      flipBtn.disabled = false;
+      correctBtn.disabled = false;
+      wrongBtn.disabled = false;
+
+      flashcard.classList.remove("flipped");
+    }
+
+    function setDeckFromFilter() {
+      const val = topicFilter.value;
+      if (val === "all") {
+        deck = [...allCards];
+      } else {
+        deck = allCards.filter(c => c.topic === val);
+      }
+      currentIndex = 0;
+      resetScore();
+      shuffleArray(deck);
+      renderCard();
+    }
+
+    topicFilter.addEventListener("change", setDeckFromFilter);
+
+    shuffleBtn.addEventListener("click", () => {
+      shuffleArray(deck);
+      currentIndex = 0;
+      resetScore();
+      renderCard();
+    });
+
+    restartBtn.addEventListener("click", () => {
+      currentIndex = 0;
+      resetScore();
+      renderCard();
+    });
+
+    prevBtn.addEventListener("click", () => {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderCard();
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      if (currentIndex < deck.length - 1) {
+        currentIndex++;
+        renderCard();
+      }
+    });
+
+    flipBtn.addEventListener("click", () => {
+      flashcard.classList.toggle("flipped");
+    });
+
+    flashcard.addEventListener("click", () => {
+      flashcard.classList.toggle("flipped");
+    });
+
+    correctBtn.addEventListener("click", () => {
+      attemptedCount++;
+      correctCount++;
+      updateScoreUI();
+      if (currentIndex < deck.length - 1) {
+        currentIndex++;
+        renderCard();
+      }
+    });
+
+    wrongBtn.addEventListener("click", () => {
+      attemptedCount++;
+      updateScoreUI();
+      if (currentIndex < deck.length - 1) {
+        currentIndex++;
+        renderCard();
+      }
+    });
+
+    shuffleArray(deck);
+    renderCard();
+    updateScoreUI();
+  </script>
+</body>
+</html>
